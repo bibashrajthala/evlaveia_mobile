@@ -1,6 +1,7 @@
 import { Text, TextInput } from 'react-native';
 import { Controller } from 'react-hook-form';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const FormInput = ({ control, name, ...otherProps }: any) => {
 	return (
 		<Controller
