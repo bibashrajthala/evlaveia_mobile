@@ -1,0 +1,103 @@
+import { useFormContext } from 'react-hook-form';
+import { Pressable, Text, TextInput, View } from 'react-native';
+import { Controller } from 'react-hook-form';
+import { useState } from 'react';
+
+// icons
+import Ionicons from '@expo/vector-icons/Ionicons';
+
+// utils
+import { cn } from '../../../utils/cn';
+
+// components
+import ErrorField from './ErrorField';
+import HelperText from './HelperText';
+
+// types
+import { IPasswordFieldProps } from '../types/formElements.types';
+
+const PasswordField = ({
+	label,
+	placeholder = '',
+	helperText = '',
+	name,
+	disabled = false,
+	fieldSize = 'default',
+	required,
+	...rest
+}: IPasswordFieldProps) => {
+	// retrieve all useForm() hook methods
+	const {
+		control,
+		formState: { errors },
+	} = useFormContext();
+
+	const [showPassword, setShowPassword] = useState(false);
+	const togglePassword = () => setShowPassword((prev) => !prev);
+
+	return (
+		<View>
+			<View>
+				<Text
+					className={cn('text-base font-medium capitalize text-evl-black-900', {
+						'text-sm': fieldSize === 'small',
+					})}
+				>
+					{label} {!!required && <Text className="text-gyj-red">*</Text>}
+				</Text>
+			</View>
+			<View className="relative mt-1">
+				<Controller
+					control={control}
+					name={name}
+					render={({ field: { value, onChange, ...restField } }) => (
+						<>
+							<TextInput
+								{...restField}
+								secureTextEntry={showPassword}
+								value={value}
+								onChangeText={onChange}
+								id={name}
+								readOnly={disabled}
+								placeholder={placeholder}
+								aria-describedby={name}
+								className={cn(
+									'w-full rounded border border-solid border-evl-black-500 bg-white p-2 shadow-sm placeholder:text-base placeholder:text-evl-black-500 after:inset-x-0 after:bottom-0 after:w-full  after:content-none focus:border focus:border-b-2 focus:border-evl-black-500 focus:border-evl-primary  focus:outline-none focus:ring-0 focus:ring-offset-0',
+									{
+										'cursor-not-allowed bg-evl-black-50  focus:border-gray-300 ':
+											disabled,
+										'focus:border-gyj-red': !!errors[name],
+										'p-1 text-sm placeholder:text-sm': fieldSize === 'small',
+									}
+								)}
+								{...rest}
+							/>
+						</>
+					)}
+				/>
+
+				{/* if there is no validation error show see password toggle button  */}
+				{!errors[name] && (
+					<Pressable
+						onPress={togglePassword}
+						className="absolute inset-y-0 right-0 mr-3 flex items-center justify-center rounded-lg p-1"
+					>
+						<Ionicons
+							name={showPassword ? 'eye-off' : 'eye'}
+							size={30}
+							color="#6b7280"
+						/>
+					</Pressable>
+				)}
+			</View>
+
+			{/* for error message or helper messages */}
+			<View className="mt-1">
+				{!!helperText && <HelperText helperText={helperText} />}
+				{!!errors[name] && <ErrorField name={name} fieldSize={fieldSize} />}
+			</View>
+		</View>
+	);
+};
+
+export default PasswordField;
